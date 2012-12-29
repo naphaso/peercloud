@@ -11,17 +11,21 @@ import javax.xml.stream.XMLStreamException;
  * Created with IntelliJ IDEA.
  * User: wolong
  * Date: 12/29/12
- * Time: 9:02 AM
+ * Time: 10:15 AM
  */
-public class InitState implements State {
-    static private Logger logger = LoggerFactory.getLogger(InitState.class);
+public class StreamUnauthState implements State {
+    static Logger logger = LoggerFactory.getLogger(StreamUnauthState.class);
+
     F2FConnection connection;
     AsyncXMLStreamReader reader;
+    InitState parent;
 
-    public InitState(F2FConnection connection, AsyncXMLStreamReader reader) {
+    public StreamUnauthState(F2FConnection connection, AsyncXMLStreamReader reader, InitState parent) {
         this.connection = connection;
         this.reader = reader;
+        this.parent = parent;
     }
+
 
     @Override
     public void handle() {
@@ -32,8 +36,8 @@ public class InitState implements State {
                 if(type == AsyncXMLStreamReader.EVENT_INCOMPLETE) break;
                 switch (type) {
                     case AsyncXMLStreamReader.START_ELEMENT:
-                        if (reader.getLocalName().equals("stream")) {
-                            StreamUnauthState state = new StreamUnauthState(connection, reader, this);
+                        if (reader.getLocalName().equals("auth")) {
+                            AuthState state = new AuthState(connection, reader, this);
                             connection.setState(state);
                             state.handle();
                         } else {
@@ -48,6 +52,7 @@ public class InitState implements State {
                             logger.warn("unknown xml element {}", reader.getLocalName());
                         }
                         break;
+
                 }
             }
         } catch (XMLStreamException e) {

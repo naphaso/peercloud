@@ -5,6 +5,8 @@ import com.fasterxml.aalto.AsyncXMLStreamReader;
 import com.fasterxml.aalto.stax.InputFactoryImpl;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import org.peercloud.xml.InitState;
+import org.peercloud.xml.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,14 +24,21 @@ public class F2FConnection {
     private static final InputFactoryImpl readerFactory = new InputFactoryImpl();
     private AsyncXMLStreamReader reader;
     private AsyncInputFeeder inputFeeder;
-
     private Channel channel;
+
+    private State state;
 
     public F2FConnection(Channel channel) {
         this.channel = channel;
 
         reader = readerFactory.createAsyncXMLStreamReader();
         inputFeeder = reader.getInputFeeder();
+
+        state = new InitState(this, reader);
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     public void close() {
@@ -46,40 +55,12 @@ public class F2FConnection {
             logger.error("XML stream feed exception", e);
         }
 
-        int type;
-        try {
-            while(true) {
-                type = reader.next();
-                *   if(type == AsyncXMLStreamReader.EVENT_INCOMPLETE)
-                    break;
-
-                switch(state) {
-                    case INIT:
-                        if(type == AsyncXMLStreamReader.START_DOCUMENT)
-                            state = State.STREAM_UNAUTH;
-                        break;
-                    case STREAM_UNAUTH:
-                        if(type == AsyncXMLStreamReader.START_ELEMENT)
-                            if(reader.getLocalName().equals("auth")) {
-
-                            }
-                    case STREAM_AUTH:
-                }
-                if (type == AsyncXMLStreamReader.START_ELEMENT) {
-                    logger.debug("start element {}", reader.getLocalName());
-                }
-
-                if(type == AsyncXMLStreamReader.END_DOCUMENT) {
-
-                }
-                logger.debug("type = {}", type);
-            }
-        } catch (XMLStreamException e) {
-            logger.error("XML stream exception: {}", e);
-        }
+        state.handle();
     }
 
     public void handleUnregister() {
         // if authenticated, notify FriendManager
     }
+
+
 }
