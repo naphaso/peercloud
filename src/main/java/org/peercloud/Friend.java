@@ -7,5 +7,6 @@ package org.peercloud;
  * Time: 9:16 AM
  */
 public class Friend {
-
+    private String host;
+    private String publickey;
 }
