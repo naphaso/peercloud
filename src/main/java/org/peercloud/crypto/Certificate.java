@@ -1,11 +1,15 @@
 package org.peercloud.crypto;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigInteger;
@@ -26,6 +30,7 @@ import java.util.regex.Pattern;
  * Date: 12/30/12
  * Time: 4:35 AM
  */
+
 public class Certificate {
     static Logger logger = LoggerFactory.getLogger(Certificate.class);
     static Pattern intervalPattern = Pattern.compile("^([a-zA-Z0-9]+)\\[([0-9:.]*)-([0-9:.]*)\\]([0-9a-f]+)$");
@@ -37,11 +42,16 @@ public class Certificate {
         dateFormat2.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
+
     String source;
     String name;
     RSAPublicKey publicKey;
     SortedMap<String, String> fields = new TreeMap<>();
-    List<Sign> signs;
+    List<Sign> signs = new ArrayList<>();
+
+    public Certificate(File file) throws IOException {
+        this(FileUtils.readFileToString(file));
+    }
 
     public Certificate(String source) {
         this.source = source;
@@ -79,7 +89,9 @@ public class Certificate {
         } catch (InvalidKeySpecException e) {
             logger.error("invalid public key", e);
         }
-        if(!name.matches("^[a-zA-Z0-9]+$"))
+
+        name = fields.get("name");
+        if(!name.matches("^[a-zA-Z0-9.]+$"))
             name = "InvalidName";
     }
 

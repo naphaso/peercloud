@@ -24,6 +24,8 @@ public class Connection {
     }
 
     public void connect() {
+
+
         Bootstrap bootstrap = new Bootstrap();
         try {
             bootstrap.group(new NioEventLoopGroup())
@@ -31,6 +33,7 @@ public class Connection {
                     .option(ChannelOption.TCP_NODELAY, true)
                     .remoteAddress(new InetSocketAddress(host, port))
                     .handler(new ConnectionInitializer());
+
 
             ChannelFuture channelFuture = bootstrap.connect().sync();
             channelFuture.channel().closeFuture().sync();
