@@ -45,6 +45,7 @@ public class Certificate {
 
     String source;
     String name;
+    String fingerprint;
     RSAPublicKey publicKey;
     SortedMap<String, String> fields = new TreeMap<>();
     List<Sign> signs = new ArrayList<>();
@@ -93,6 +94,16 @@ public class Certificate {
         name = fields.get("name");
         if(!name.matches("^[a-zA-Z0-9.]+$"))
             name = "InvalidName";
+
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            digest.reset();
+            digest.update(fields.get("publickey").getBytes());
+            fingerprint = Hex.encodeHexString(digest.digest());
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("SHA-1 not found");
+        }
     }
 
     public String getName() {
