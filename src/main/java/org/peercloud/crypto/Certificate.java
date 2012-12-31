@@ -14,8 +14,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigInteger;
 import java.security.*;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPrivateCrtKeySpec;
+import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -43,22 +46,42 @@ public class Certificate {
     }
 
 
-    String source;
     String name;
     String fingerprint;
     RSAPublicKey publicKey;
+    RSAPrivateKey privateKey;
     SortedMap<String, String> fields = new TreeMap<>();
     List<Sign> signs = new ArrayList<>();
+    boolean valid;
 
     public Certificate(File file) throws IOException {
         this(FileUtils.readFileToString(file));
     }
 
+    public Certificate(String name, RSAPrivateKey rsaPrivateKey, RSAPublicKey rsaPublicKey) {
+        this.name = name;
+        this.privateKey = rsaPrivateKey;
+        this.publicKey = rsaPublicKey;
+        try {
+        MessageDigest digest = MessageDigest.getInstance("SHA-1");
+        digest.reset();
+        digest.update(publicKey.getModulus().toString(16).getBytes());
+        digest.update(":".getBytes());
+        digest.update(publicKey.getPublicExponent().toString(16).getBytes());
+        this.fingerprint = Hex.encodeHexString(digest.digest());
+        } catch(NoSuchAlgorithmException e) {
+            logger.error("SHA-1 not found", e);
+            return;
+        }
+        valid = true;
+    }
+
     public Certificate(String source) {
-        this.source = source;
+        this.valid = false;
+        //this.source = source;
         StringReader reader = new StringReader(source);
         BufferedReader bufferedReader = new BufferedReader(reader);
-        String line = null;
+        String line;
         try {
             line = bufferedReader.readLine();
             while (line != null) {
@@ -66,44 +89,66 @@ public class Certificate {
                 if (tokens.length == 2) {
                     if (tokens[0].equals("sign"))
                         signs.add(new Sign(tokens[1]));
+                    else if(tokens[0].equals("fingerprint"))
+                        fingerprint = tokens[1];
                     else
                         fields.put(tokens[0], tokens[1]);
                 }
                 line = bufferedReader.readLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("exception", e);
+            return;
         }
+
         try {
-            String publickeyParts[] = fields.get("publickey").split(":");
+            String[] publickeyParts = fields.get("publickey").split(":");
             BigInteger modulo = new BigInteger(publickeyParts[0], 16);
             BigInteger publicExponent = new BigInteger(publickeyParts[1], 16);
             RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulo, publicExponent);
-            KeyFactory fact = null;
-
-            fact = KeyFactory.getInstance("RSA");
-
+            KeyFactory fact = KeyFactory.getInstance("RSA");
             publicKey = (RSAPublicKey) fact.generatePublic(keySpec);
+
+            if(fields.containsKey("privatekey")) {
+                String[] privatekeyParts = fields.get("privatekey").split(":");
+                BigInteger modulus = new BigInteger(privatekeyParts[0], 16);
+                BigInteger privateExponent = new BigInteger(privatekeyParts[1], 16);
+                RSAPrivateKeySpec privateKeySpec = new RSAPrivateKeySpec(modulus, privateExponent);
+                privateKey = (RSAPrivateKey) fact.generatePrivate(privateKeySpec);
+            }
 
         } catch (NoSuchAlgorithmException e) {
             logger.error("RSA not found?", e);
+            return;
         } catch (InvalidKeySpecException e) {
             logger.error("invalid public key", e);
+            return;
         }
 
         name = fields.get("name");
-        if(!name.matches("^[a-zA-Z0-9.]+$"))
-            name = "InvalidName";
+        if(!name.matches("^[a-zA-Z0-9.]+$")) {
+            logger.error("invalid name in certificate: {}", name);
+            return;
+        }
 
 
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
             digest.reset();
-            digest.update(fields.get("publickey").getBytes());
-            fingerprint = Hex.encodeHexString(digest.digest());
+            digest.update(publicKey.getModulus().toString(16).getBytes());
+            digest.update(":".getBytes());
+            digest.update(publicKey.getPublicExponent().toString(16).getBytes());
+
+            String real_fingerprint = Hex.encodeHexString(digest.digest());
+            if(fingerprint != null && !real_fingerprint.equals(fingerprint)) {
+                logger.error("invalid fingerprint in {} certificate: {} != {}", name, fingerprint, real_fingerprint);
+                return;
+            }
         } catch (NoSuchAlgorithmException e) {
             logger.error("SHA-1 not found");
+            return;
         }
+        valid = true; // all correct
     }
 
     public String getName() {
@@ -116,12 +161,17 @@ public class Certificate {
 
     private String getSignedString() {
         StringBuilder stringBuilder = new StringBuilder();
+        /*
         for (SortedMap.Entry<String, String> e : fields.entrySet()) {
             stringBuilder.append(e.getKey());
             stringBuilder.append(':');
             stringBuilder.append(e.getValue());
             stringBuilder.append('\n');
-        }
+        }*/
+        stringBuilder.append("name:").append(name).append('\n');
+        stringBuilder.append("publickey")
+                .append(publicKey.getModulus().toString(16)).append(":")
+                .append(publicKey.getPublicExponent().toString(16)).append("\n");
         return stringBuilder.toString();
     }
 
@@ -130,7 +180,7 @@ public class Certificate {
         try {
             Signature verifier = Signature.getInstance("SHA256withRSA");
             verifier.initVerify(this.getPublicKey());
-            verifier.update(cert.getSignedString().getBytes());
+            verifier.update((cert.getSignedString() + signature.getFromto()).getBytes());
             return verifier.verify(signature.getSignature());
         } catch (InvalidKeyException e) {
             logger.error("invalid public key", e);
@@ -143,30 +193,64 @@ public class Certificate {
     }
 
     public String serialize() {
-        if(source != null)
-            return source;
-        return ""; // TODO: certificate serialization (on new certs)
+        if(valid) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("name: ").append(name).append("\n");
+            stringBuilder.append("fingerprint: ").append(fingerprint).append("\n");
+            stringBuilder.append("publickey: ")
+                    .append(publicKey.getModulus().toString(16)).append(":")
+                    .append(publicKey.getPublicExponent().toString(16)).append("\n");
+            if(privateKey != null)
+                stringBuilder.append("privatekey: ")
+                        .append(privateKey.getModulus().toString(16)).append(":")
+                        .append(privateKey.getPrivateExponent().toString(16)).append("\n");
+            for(Sign sign : signs)
+                if(sign.isValid())
+                    stringBuilder.append("sign: ").append(sign.serialize()).append("\n");
+            return stringBuilder.toString();
+        }
+        return "";
+    }
+
+    public boolean isValid() {
+        return valid;
     }
 
     public class Sign {
-
+        boolean valid;
+        String source;
+        String fromto;
         String author;
         byte[] signature;
         long from;
         long to;
 
         public Sign(String source) {
+            this.source = source;
             Matcher matcher = intervalPattern.matcher(source);
             if (matcher.find()) {
                 try {
                     author = matcher.group(1);
                     from = dateToTimestamp(matcher.group(2));
                     to = dateToTimestamp(matcher.group(3));
+                    fromto = matcher.group(2) + "-" + matcher.group(3);
                     signature = Hex.decodeHex(matcher.group(4).toCharArray());
                 } catch (DecoderException e) {
                     logger.error("invalid signature hex string");
                 }
             }
+        }
+
+        public String serialize() {
+            return source;
+        }
+
+        public String getFromto() {
+            return fromto;
+        }
+
+        public boolean isValid() {
+            return valid;
         }
 
         public byte[] getSignature() {
