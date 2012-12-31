@@ -8,8 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,7 +31,7 @@ public class CertificateStorage {
                 Certificate cert = new Certificate(file);
                 logger.debug("load certificate {} with name {}", file.getName(), cert.getName());
                 if (cert.isValid()) {
-                    certs.put(cert.getName(), cert);
+                    certs.put(cert.getFingerprint(), cert);
                     logger.debug("certificate {} successfully loaded", cert.getName());
                 } else {
                     logger.error("error loading certificate {}", cert.getName());
@@ -41,7 +40,6 @@ public class CertificateStorage {
                 logger.error("error reading certificate file", e);
             }
         }
-
     }
 
     public static synchronized CertificateStorage getInstance() {
@@ -50,8 +48,16 @@ public class CertificateStorage {
         return instance;
     }
 
-    public Certificate getCertificate(String name) {
-        return certs.get(name);
+    public List<Certificate> getCertificatesByName(String name) {
+        ArrayList<Certificate> result = new ArrayList<>();
+        for(Certificate cert : certs.values())
+            if(cert.getName().equals(name))
+                result.add(cert);
+        return result;
+    }
+
+    public Certificate getCertificateByFingerprint(String fingerprint) {
+        return certs.get(fingerprint);
     }
 
     public void saveCertificate(Certificate cert) {

@@ -216,6 +216,10 @@ public class Certificate {
         return valid;
     }
 
+    public String getFingerprint() {
+        return fingerprint;
+    }
+
     public class Sign {
         boolean valid;
         String source;
