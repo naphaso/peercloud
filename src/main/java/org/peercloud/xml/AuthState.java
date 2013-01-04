@@ -18,12 +18,10 @@ public class AuthState implements State {
 
     F2FConnection connection;
     AsyncXMLStreamReader reader;
-    StreamUnauthState parent;
 
-    public AuthState(F2FConnection connection, AsyncXMLStreamReader reader, StreamUnauthState parent) {
+    public AuthState(F2FConnection connection, AsyncXMLStreamReader reader) {
         this.connection = connection;
         this.reader = reader;
-        this.parent = parent;
     }
 
     int within = 0;
@@ -64,7 +62,8 @@ public class AuthState implements State {
                                 } else {
                                     logger.info("auth failed, user = {}, password = {}", user, password);
                                 }
-                                connection.setState(parent);
+                                //connection.setState(parent);
+                                connection.popState();
                                 return;
                             } else {
                                 logger.warn("unknown xml element {}", reader.getLocalName());

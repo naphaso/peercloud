@@ -20,7 +20,7 @@ public class F2FConnectionManager {
     Map<Integer, F2FConnection> channelMap;
 
     private F2FConnectionManager() {
-        channelMap = new HashMap<Integer, F2FConnection>();
+        channelMap = new HashMap<>();
     }
 
     public static synchronized F2FConnectionManager getInstance() {
@@ -29,15 +29,19 @@ public class F2FConnectionManager {
         return instance;
     }
 
-    public void registerChannel(Channel channel) {
+    public void registerChannel(Channel channel, boolean client) {
         logger.debug("register channel with id {}, remote address {}", channel.id(), channel.remoteAddress());
-        channelMap.put(channel.id(), new F2FConnection(channel));
+        channelMap.put(channel.id(), new F2FConnection(channel, client));
     }
 
     public void unregisterChannel(Channel channel) {
         logger.debug("unregister channel with id {}, remote address {}", channel.id(), channel.remoteAddress());
-        channelMap.get(channel.id()).handleUnregister();
-        channelMap.remove(channel.id());
+        if(channelMap.containsKey(channel.id())) {
+            channelMap.get(channel.id()).handleUnregister();
+            channelMap.remove(channel.id());
+        } else {
+            logger.warn("unregister non-existing channel, id {}", channel.id());
+        }
     }
 
     public F2FConnection getConnection(Integer id) {

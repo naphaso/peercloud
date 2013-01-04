@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.XMLStreamException;
 import java.nio.charset.Charset;
+import java.util.Stack;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,37 +26,61 @@ public class F2FConnection {
     private AsyncXMLStreamReader reader;
     private AsyncInputFeeder inputFeeder;
     private Channel channel;
+    private boolean client;
 
-    private State state;
+    //private State state;
+    private Stack<State> states;
 
-    public F2FConnection(Channel channel) {
+    public boolean isClient() {
+        return client;
+    }
+
+    public void pushState(State state) {
+        states.push(state);
+    }
+
+    public void popState() {
+        states.pop();
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public F2FConnection(Channel channel, boolean client) {
         this.channel = channel;
+        this.client  = client;
+        logger.debug("creating F2FConnection for channel id {}", channel.id());
 
         reader = readerFactory.createAsyncXMLStreamReader();
         inputFeeder = reader.getInputFeeder();
 
-        state = new InitState(this, reader);
+        //state = new InitState(this, reader);
+        states = new Stack<>();
+        pushState(new InitState(this, reader));
     }
 
-    public void setState(State state) {
-        this.state = state;
-    }
+    //public void setState(State state) {
+    //    this.state = state;
+    //}
 
     public void close() {
         channel.close();
     }
 
-    public void handleData(ByteBuf in) {
-        logger.debug("handle data for connection id {}, data = '{}'", channel.id(), in.toString(0, in.readableBytes(), Charset.forName("UTF-8")));
+    public void handleData(String in) {
+        logger.debug("handle data for connection id {}, data = '{}'", channel.id(), in);
 
         try {
-            inputFeeder.feedInput(in.array(), 0, in.readableBytes());
-            in.clear();
+            inputFeeder.feedInput(in.getBytes(), 0, in.length());
+            //inputFeeder.feedInput(in.array(), 0, in.readableBytes());
+            //in.clear();
         } catch (XMLStreamException e) {
             logger.error("XML stream feed exception", e);
         }
 
-        state.handle();
+        //state.handle();
+        states.peek().handle();
     }
 
     public void handleUnregister() {

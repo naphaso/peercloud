@@ -19,8 +19,11 @@ public class InitState implements State {
     AsyncXMLStreamReader reader;
 
     public InitState(F2FConnection connection, AsyncXMLStreamReader reader) {
+        logger.debug("InitState for connection id {}", connection.getChannel().id());
         this.connection = connection;
         this.reader = reader;
+
+        connection.getChannel().write("<stream version=\"1.0\">\n");
     }
 
     @Override
@@ -33,8 +36,11 @@ public class InitState implements State {
                 switch (type) {
                     case AsyncXMLStreamReader.START_ELEMENT:
                         if (reader.getLocalName().equals("stream")) {
-                            StreamUnauthState state = new StreamUnauthState(connection, reader, this);
-                            connection.setState(state);
+                            if(!reader.getAttributeValue("", "version").equals("1.0")) {
+                                // TODO: version compatibility code
+                            }
+                            IDState state = new IDState(connection, reader);
+                            connection.pushState(state);
                             state.handle();
                         } else {
                             logger.warn("unknown xml element {}", reader.getLocalName());

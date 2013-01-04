@@ -1,6 +1,8 @@
 package org.peercloud;
 
 import com.thoughtworks.xstream.XStream;
+import io.netty.bootstrap.AbstractBootstrap;
+import io.netty.channel.Channel;
 import org.peercloud.crypto.Certificate;
 import org.peercloud.crypto.CertificateFactory;
 import org.peercloud.crypto.CertificateStorage;
@@ -8,7 +10,8 @@ import org.peercloud.network.Server;
 
 public class App {
     public static void main(String[] args) {
-        //Server server = new Server();
+
+        //Server.getInstance().run();
         //server.run();
 
         /*
@@ -28,7 +31,12 @@ public class App {
         XStream xstream = new XStream();
         String xml = xstream.toXML(alice);
         System.out.println(xml);*/
-       // CertificateFactory.getInstance().generate("wolong");
+        //Certificate cert = CertificateFactory.getInstance().generate("wolong");
+        //CertificateStorage.getInstance().saveCertificate(cert);
         //CertificateStorage storage = CertificateStorage.getInstance();
+
+        Certificate certificate = CertificateStorage.getInstance()
+                .getCertificateByFingerprint("ccd92c8d94aedf0f9fd150c5b5b5e0e6e3ea09bb");
+        certificate.checkSigns();
     }
 }

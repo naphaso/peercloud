@@ -31,17 +31,19 @@ public class FileKeyValueStorageDriver implements KeyValueStorageDriver {
 
     @Override
     public void put(String key, String value) {
+        //logger.debug("put key {}, value '{}'", key, value);
         try {
             FileWriter fw = new FileWriter(new File(directory, key));
             fw.write(value);
             fw.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("error store key-value pair ({}, {})", key, value);
         }
     }
 
     @Override
     public String get(String key) {
+        //logger.debug("get value by key {}", key);
         try {
             File target = new File(directory, key);
             if(target.exists() && target.isFile() && target.canRead())

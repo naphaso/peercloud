@@ -159,7 +159,7 @@ public class Certificate {
         return publicKey;
     }
 
-    private String getSignedString() {
+    public String getSignedString() {
         StringBuilder stringBuilder = new StringBuilder();
         /*
         for (SortedMap.Entry<String, String> e : fields.entrySet()) {
@@ -173,6 +173,36 @@ public class Certificate {
                 .append(publicKey.getModulus().toString(16)).append(":")
                 .append(publicKey.getPublicExponent().toString(16)).append("\n");
         return stringBuilder.toString();
+    }
+
+    public void addSignature(Sign sign) {
+        signs.add(sign);
+        CertificateStorage.getInstance().updateCertificate(this);
+    }
+
+    public Sign signCertificate(Certificate cert, String from, String to) {
+        if(privateKey == null) {
+            logger.error("signing by public certificate");
+            return null;
+        }
+        try {
+            Signature signer = Signature.getInstance("SHA256withRSA");
+            signer.initSign(privateKey);
+            String fromto = from + "-" + to;
+            signer.update((cert.getSignedString() + fromto).getBytes());
+            String signStr = Hex.encodeHexString(signer.sign());
+            Sign sign = new Sign(this.getFingerprint() + "[" + fromto + "]" + signStr);
+            cert.addSignature(sign);
+
+            return sign;
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("SHA256withRSA not found", e);
+        } catch (InvalidKeyException e) {
+            logger.error("invalid key", e);
+        } catch (SignatureException e) {
+            logger.error("signature exception", e);
+        }
+        return null;
     }
 
     public boolean checkSignature(Certificate cert, Sign signature) {
@@ -192,7 +222,7 @@ public class Certificate {
         return false;
     }
 
-    public String serialize() {
+    public String serialize(boolean withPrivateKey) {
         if(valid) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("name: ").append(name).append("\n");
@@ -200,15 +230,19 @@ public class Certificate {
             stringBuilder.append("publickey: ")
                     .append(publicKey.getModulus().toString(16)).append(":")
                     .append(publicKey.getPublicExponent().toString(16)).append("\n");
-            if(privateKey != null)
+            if(withPrivateKey && privateKey != null)
                 stringBuilder.append("privatekey: ")
                         .append(privateKey.getModulus().toString(16)).append(":")
                         .append(privateKey.getPrivateExponent().toString(16)).append("\n");
-            for(Sign sign : signs)
-                if(sign.isValid())
+            for(Sign sign : signs) {
+                //sign.checkValidity();
+                //if(sign.isValid())
                     stringBuilder.append("sign: ").append(sign.serialize()).append("\n");
+
+            }
             return stringBuilder.toString();
         }
+
         return "";
     }
 
@@ -218,6 +252,23 @@ public class Certificate {
 
     public String getFingerprint() {
         return fingerprint;
+    }
+
+    public void checkSigns() {
+        logger.debug("checking signatures for cert {}", fingerprint);
+        for(Sign sign : signs) {
+            logger.debug("checking signature from {}", sign.getAuthor());
+            Certificate authorCert = CertificateStorage.getInstance().getCertificateByFingerprint(sign.getAuthor());
+            if(authorCert == null) {
+                logger.debug("unknown author");
+            } else {
+                if(authorCert.checkSignature(this, sign)) {
+                    logger.debug("signature from {} valid", sign.getAuthor());
+                } else {
+                    logger.debug("signature from {} invalid", sign.getAuthor());
+                }
+            }
+        }
     }
 
     public class Sign {
@@ -251,6 +302,10 @@ public class Certificate {
 
         public String getFromto() {
             return fromto;
+        }
+
+        public String getAuthor() {
+            return author;
         }
 
         public boolean isValid() {

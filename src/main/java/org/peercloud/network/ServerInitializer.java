@@ -3,6 +3,10 @@ package org.peercloud.network;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import org.peercloud.network.ServerHandler;
 
 /**
@@ -21,6 +25,12 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 // Add the number codec first,
         //pipeline.addLast("decoder", new BigIntegerDecoder());
         //pipeline.addLast("encoder", new NumberEncoder());
+        pipeline.addLast("framer", new DelimiterBasedFrameDecoder(
+                8192, Delimiters.lineDelimiter()));
+
+        pipeline.addLast("decoder", new StringDecoder());
+        pipeline.addLast("encoder", new StringEncoder());
+
 // and then business logic.
 // Please note we create a handler for every new channel
 // because it has stateful properties.

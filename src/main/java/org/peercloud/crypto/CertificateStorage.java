@@ -19,27 +19,32 @@ import java.util.*;
 public class CertificateStorage {
     private static Logger logger = LoggerFactory.getLogger(CertificateStorage.class);
     private static CertificateStorage instance;
+    private static String certsDir = "certs";
+    // Fingerprint -> Certificate map
     HashMap<String, Certificate> certs = new HashMap<>();
 
-    private CertificateStorage() {
-        Collection<File> listCerts = (Collection<File>) FileUtils.listFiles(new File("certs"),
-                new RegexFileFilter("^[a-zA-Z0-9.]+\\.txt$"),
-                new RegexFileFilter("^[a-zA-Z0-9.]+$"));
+    private KeyValueStorageDriver storageDriver;
 
-        for (File file : listCerts) {
-            try {
-                Certificate cert = new Certificate(file);
-                logger.debug("load certificate {} with name {}", file.getName(), cert.getName());
-                if (cert.isValid()) {
-                    certs.put(cert.getFingerprint(), cert);
-                    logger.debug("certificate {} successfully loaded", cert.getName());
-                } else {
-                    logger.error("error loading certificate {}", cert.getName());
-                }
-            } catch (IOException e) {
-                logger.error("error reading certificate file", e);
+    private CertificateStorage() {
+        storageDriver = new FileKeyValueStorageDriver(certsDir);
+        for(String s : storageDriver) {
+            Certificate cert = new Certificate(s);
+            if (cert.isValid()) {
+                certs.put(cert.getFingerprint(), cert);
+                logger.debug("certificate {} successfully loaded", cert.getName());
+            } else {
+                logger.error("error loading certificate {}", cert.getName());
             }
         }
+    }
+
+    public static void setCertsDir(String certsDir) {
+        CertificateStorage.certsDir = certsDir;
+        instance = null;
+    }
+
+    public static void reset() {
+        instance = null;
     }
 
     public static synchronized CertificateStorage getInstance() {
@@ -61,17 +66,19 @@ public class CertificateStorage {
     }
 
     public void saveCertificate(Certificate cert) {
-        if (certs.containsKey(cert.getName())) {
-            certs.put(cert.getName(), cert);
-            try {
-                FileWriter fw = new FileWriter("certs/" + cert.getName() + ".txt");
-                fw.write(cert.serialize());
-                fw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (!certs.containsKey(cert.getFingerprint())) {
+            certs.put(cert.getFingerprint(), cert);
+            storageDriver.put(cert.getFingerprint(), cert.serialize(true));
         } else {
             // TODO: comparison of certs
+        }
+    }
+
+    public void updateCertificate(Certificate cert) {
+        if(certs.containsKey(cert.getFingerprint())) {
+            storageDriver.put(cert.getFingerprint(), cert.serialize(true));
+        } else {
+            //logger.warn("try to update non-existing certificate");
         }
     }
 }

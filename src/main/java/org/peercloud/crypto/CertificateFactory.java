@@ -29,7 +29,7 @@ public class CertificateFactory {
     }
 
     public Certificate generate(String name) {
-
+        logger.debug("generate certificate for {}", name);
         try {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
             kpg.initialize(2048);
@@ -38,11 +38,13 @@ public class CertificateFactory {
             RSAPrivateKey privateKey = (RSAPrivateKey) kp.getPrivate();
 
             Certificate cert = new Certificate(name, privateKey, publicKey);
-            System.out.println(cert.serialize());
+            //System.out.println(cert.serialize());
+            cert.signCertificate(cert, "", "");
             return cert;
         } catch (NoSuchAlgorithmException e) {
             logger.error("RSA not found", e);
             return null;
         }
+
     }
 }
