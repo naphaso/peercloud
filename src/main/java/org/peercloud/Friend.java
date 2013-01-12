@@ -12,20 +12,54 @@ import org.peercloud.network.F2FConnection;
 
 @XStreamAlias("friend")
 public class Friend {
+    public Status getStatus() {
+        return status;
+    }
+
+    public enum Status {
+        UNKNOWN, ONLINE, OFFLINE, REJECTED
+    }
+
     @XStreamAsAttribute()
-    @XStreamAlias("name")
-    private String name;
-    @XStreamAlias("host")
-    private String host;
+    @XStreamAlias("description")
+    private String description;
+
     @XStreamAlias("fingerprint")
     private String fingerprint;
 
     @XStreamOmitField
     private F2FConnection connection;
+    @XStreamOmitField
+    private Status status;
 
     public Friend(String name, String host, String fingerprint) {
-        this.name = name;
-        this.host = host;
+        this.description = description;
         this.fingerprint = fingerprint;
+        this.status = Status.UNKNOWN;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getFingerprint() {
+        return fingerprint;
+    }
+
+    public void handleConnected(F2FConnection connection) {
+        this.connection = connection;
+        this.status = Status.ONLINE;
+    }
+
+    public void handleDisconnect() {
+        status = Status.UNKNOWN;
+    }
+
+    public void handleReject() {
+        status = Status.REJECTED;
+    }
+
+    public void handleRefused() {
+        status = Status.OFFLINE;
     }
 }

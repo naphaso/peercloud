@@ -32,11 +32,11 @@ public class Connection {
                     .channel(NioSocketChannel.class)
                     .option(ChannelOption.TCP_NODELAY, true)
                     .remoteAddress(new InetSocketAddress(host, port))
-                    .handler(new ConnectionInitializer());
+                    .handler(new ConnectionInitializer(false));
 
 
             ChannelFuture channelFuture = bootstrap.connect().sync();
-            channelFuture.channel().closeFuture().sync();
+            //channelFuture.await(15, Time)
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {

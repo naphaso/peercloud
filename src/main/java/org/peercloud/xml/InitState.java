@@ -26,6 +26,8 @@ public class InitState implements State {
         connection.getChannel().write("<stream version=\"1.0\">\n");
     }
 
+
+
     @Override
     public void handle() {
         int type;

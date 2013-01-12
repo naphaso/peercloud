@@ -11,7 +11,7 @@ import org.peercloud.network.Server;
 public class App {
     public static void main(String[] args) {
 
-        //Server.getInstance().run();
+        Server.getInstance().run();
         //server.run();
 
         /*
@@ -35,8 +35,8 @@ public class App {
         //CertificateStorage.getInstance().saveCertificate(cert);
         //CertificateStorage storage = CertificateStorage.getInstance();
 
-        Certificate certificate = CertificateStorage.getInstance()
-                .getCertificateByFingerprint("ccd92c8d94aedf0f9fd150c5b5b5e0e6e3ea09bb");
-        certificate.checkSigns();
+        //Certificate certificate = CertificateStorage.getInstance()
+        //        .getCertificateByFingerprint("ccd92c8d94aedf0f9fd150c5b5b5e0e6e3ea09bb");
+        //certificate.checkSigns();
     }
 }

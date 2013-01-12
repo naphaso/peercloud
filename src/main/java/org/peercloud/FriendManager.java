@@ -48,4 +48,18 @@ public class FriendManager {
             logger.error("error write friends.xml", e);
         }
     }
+
+    public Friend getFriend(String fingerprint) {
+        for(Friend friend : friends)
+            if(friend.getFingerprint().equals(fingerprint))
+                return friend;
+        return null;
+    }
+
+    public boolean inNetwork() {
+        for(Friend friend : friends)
+            if(friend.getStatus() == Friend.Status.ONLINE)
+                return true;
+        return false;
+    }
 }
