@@ -33,6 +33,10 @@ public class Server {
     static final Logger logger = LoggerFactory.getLogger(Server.class);
     private static Server instance;
 
+    public Config getConfig() {
+        return config;
+    }
+
     private Config config;
 
     private Server() {
@@ -79,7 +83,7 @@ public class Server {
             // Start the server.
             logger.debug("Listening...");
             ChannelFuture f = b.bind().sync();
-            
+
 
             FriendManager friendManager = FriendManager.getInstance();
             Random randomGenerator = new Random();

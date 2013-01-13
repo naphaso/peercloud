@@ -1,6 +1,7 @@
 package org.peercloud;
 
 import com.thoughtworks.xstream.XStream;
+import org.peercloud.network.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +25,7 @@ public class FriendManager {
     private FriendManager() {
         XStream xstream = new XStream();
         xstream.processAnnotations(Friend.class);
-        friends = (List<Friend>) xstream.fromXML(new File("friends.xml"));
+        friends = (List<Friend>) xstream.fromXML(new File(Server.getInstance().getConfig().getBasedir() + "/friends.xml"));
     }
 
     public static synchronized FriendManager getInstance() {

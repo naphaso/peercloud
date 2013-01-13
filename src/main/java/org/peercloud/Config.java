@@ -30,7 +30,11 @@ public class Config {
     }
 
     List<InetAddress> bootstrap = new ArrayList<InetAddress>();
+    String basedir;
 
+    public String getBasedir() {
+        return basedir;
+    }
 
     public void load(String filename) throws FileNotFoundException {
         Yaml yaml = new Yaml();
@@ -43,5 +47,8 @@ public class Config {
             } catch (UnknownHostException e) {
                 logger.warn("bootstrap unknown host: {}", addr);
             }
+
+        basedir = (String) doc.get("basedir");
+
     }
 }

@@ -7,7 +7,6 @@ import com.fasterxml.aalto.AsyncXMLStreamReader;
  * User: wolong
  * Date: 12/29/12
  * Time: 8:58 AM
- * To change this template use File | Settings | File Templates.
  */
 public interface State {
     public void handle();

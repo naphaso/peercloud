@@ -52,7 +52,7 @@ public class Certificate {
     RSAPrivateKey privateKey;
     SortedMap<String, String> fields = new TreeMap<>();
     List<Sign> signs = new ArrayList<>();
-    boolean valid;
+    boolean valid = false;
 
     public Certificate(File file) throws IOException {
         this(FileUtils.readFileToString(file));
@@ -77,13 +77,13 @@ public class Certificate {
     }
 
     public Certificate(String source) {
-        this.valid = false;
-        //this.source = source;
+        logger.debug("loading certificate '{}'", source);
+
         StringReader reader = new StringReader(source);
         BufferedReader bufferedReader = new BufferedReader(reader);
-        String line;
+
         try {
-            line = bufferedReader.readLine();
+            String line = bufferedReader.readLine();
             while (line != null) {
                 String[] tokens = line.split(":\\s*", 2);
                 if (tokens.length == 2) {

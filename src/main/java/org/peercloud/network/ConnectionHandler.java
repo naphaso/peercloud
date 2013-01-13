@@ -20,7 +20,7 @@ public class ConnectionHandler extends ChannelInboundMessageHandlerAdapter<Strin
     @Override
     public void messageReceived(ChannelHandlerContext ctx, String in) throws Exception {
         F2FConnection connection = F2FConnectionManager.getInstance().getConnection(ctx.channel().id());
-        connection.handleData(in);
+        connection.handleData(in + "\n");
     }
 
 

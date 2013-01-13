@@ -2,6 +2,7 @@ package org.peercloud.crypto;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.peercloud.network.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,7 @@ import java.util.*;
 public class CertificateStorage {
     private static Logger logger = LoggerFactory.getLogger(CertificateStorage.class);
     private static CertificateStorage instance;
-    private static String certsDir = "certs";
+    private static String certsDir = Server.getInstance().getConfig().getBasedir() + "/certs";
     // Fingerprint -> Certificate map
     HashMap<String, Certificate> certs = new HashMap<>();
 
@@ -37,6 +38,8 @@ public class CertificateStorage {
             }
         }
     }
+
+
 
     public static void setCertsDir(String certsDir) {
         CertificateStorage.certsDir = certsDir;

@@ -5,6 +5,7 @@ import com.fasterxml.aalto.AsyncXMLStreamReader;
 import com.fasterxml.aalto.stax.InputFactoryImpl;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import org.peercloud.Friend;
 import org.peercloud.xml.InitState;
 import org.peercloud.xml.State;
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ public class F2FConnection {
     private AsyncInputFeeder inputFeeder;
     private Channel channel;
     private boolean client;
-
+    private Friend friend;
     //private State state;
     private Stack<State> states;
 
@@ -45,6 +46,10 @@ public class F2FConnection {
 
     public Channel getChannel() {
         return channel;
+    }
+
+    public void setFriend(Friend friend) {
+        this.friend = friend;
     }
 
     public F2FConnection(Channel channel, boolean client) {
