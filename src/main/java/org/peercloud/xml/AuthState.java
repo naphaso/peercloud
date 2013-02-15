@@ -59,11 +59,13 @@ public class AuthState implements State {
                                 // auth proceed...
                                 if("wolong".equals(user) && "123".equals(password)) {
                                     logger.info("auth success");
+                                    connection.pushState(new SessionState(connection, reader));
                                 } else {
                                     logger.info("auth failed, user = {}, password = {}", user, password);
+                                    connection.close();
                                 }
                                 //connection.setState(parent);
-                                connection.popState();
+
                                 return;
                             } else {
                                 logger.warn("unknown xml element {}", reader.getLocalName());
