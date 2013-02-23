@@ -17,8 +17,11 @@ import java.util.List;
 
 public class App {
     public static void main(String[] args) {
-        AbstractApplicationContext context = new ClassPathXmlApplicationContext("contexts/server.xml");
 
+
+        AbstractApplicationContext context = new ClassPathXmlApplicationContext("contexts/server.xml");
+        Thread.sleep(60);
+        /*
         NoteService noteService = context.getBean(NoteService.class);
 
         for(int i = 0; i < 10000; i++) {
@@ -38,7 +41,8 @@ public class App {
             Thread.sleep(30000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
+
 
         //Server.getInstance().run();
 
