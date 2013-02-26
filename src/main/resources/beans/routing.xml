@@ -13,19 +13,16 @@
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-
-    <bean id="timer" class="java.util.Timer">
-        <constructor-arg value="globalTimer" />
+    <bean id="routingThreadPool" class="io.netty.channel.socket.nio.NioEventLoopGroup">
+        <constructor-arg value="4" /> <!-- number of threads -->
     </bean>
-    <context:annotation-config />
 
-    <context:component-scan base-package="org.peercloud.network.data" />
-    <!--context:component-scan base-package="org.peercloud.service" /-->
+    <bean id="routingHandler" class="org.peercloud.network.data.RoutingHandler" />
+    <bean id="routingTable" class="org.peercloud.network.data.RoutingTable" />
 
-    <!-- import data access beans -->
-    <!--import resource="classpath:/beans/data.xml" /-->
-
-    <!-- web interface -->
-    <!--import resource="classpath:/beans/web.xml" /-->
-    <import resource="classpath:/beans/routing.xml" />
+    <bean id="routingServer" class="org.peercloud.network.data.UDPServer">
+        <property name="port" value="9091" />
+        <property name="threadPool" ref="routingThreadPool" />
+        <property name="packetHandler" ref="routingHandler" />
+    </bean>
 </beans>
