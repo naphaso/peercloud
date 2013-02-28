@@ -14,19 +14,16 @@
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
 
-    <bean id="timer" class="java.util.Timer">
-        <constructor-arg value="globalTimer" />
+    <bean id="threadPool" class="org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean">
+        <property name="corePoolSize" value="1" />
+        <property name="maxPoolSize" value="1000" />
+        <property name="queueCapacity" value="0" />
+        <property name="threadGroupName" value="F2FThreads" />
+        <property name="threadNamePrefix" value="F2FThread-" />
     </bean>
-    <!--context:annotation-config /-->
 
-    <!--context:component-scan base-package="org.peercloud.network.data" /-->
-    <!--context:component-scan base-package="org.peercloud.service" /-->
-
-    <!-- import data access beans -->
-    <!--import resource="classpath:/beans/data.xml" /-->
-
-    <!-- web interface -->
-    <!--import resource="classpath:/beans/web.xml" /-->
-    <!--import resource="classpath:/beans/routing.xml" /-->
-    <import resource="classpath:/beans/control.xml" />
+    <bean id="controlServer" class="org.peercloud.network.control.ControlServer">
+        <property name="port" value="9999" />
+        <property name="threadPoolExecutor" ref="threadPool" />
+    </bean>
 </beans>

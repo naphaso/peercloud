@@ -26,8 +26,8 @@ public class App {
 
 
         AbstractApplicationContext context = new ClassPathXmlApplicationContext("contexts/server.xml");
-        RoutingTable routingTable = (RoutingTable) context.getBean("routingTable");
-        routingTable.addRoute(new LinkID("30313233343536373839"), new RouteAction(new InetSocketAddress("127.0.0.1", 9092)));
+        //RoutingTable routingTable = (RoutingTable) context.getBean("routingTable");
+        //routingTable.addRoute(new LinkID("30313233343536373839"), new RouteAction(new InetSocketAddress("127.0.0.1", 9092)));
 
         /*
         NoteService noteService = context.getBean(NoteService.class);
