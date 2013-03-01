@@ -3,6 +3,7 @@ package org.peercloud;
 import com.thoughtworks.xstream.XStream;
 import io.netty.bootstrap.AbstractBootstrap;
 import io.netty.channel.Channel;
+import org.eclipse.jetty.server.nio.NetworkTrafficSelectChannelConnector;
 import org.hsqldb.rowio.RowOutputText;
 import org.peercloud.crypto.Certificate;
 import org.peercloud.crypto.CertificateFactory;
