@@ -13,17 +13,17 @@
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean id="webConnector" class="org.eclipse.jetty.server.nio.NetworkTrafficSelectChannelConnector">
-        <constructor-arg ref="jettyServer" />
-        <property name="port" value="7777" />
-    </bean>
+    <util:list id="webConnectors">
+        <bean id="webConnector" class="org.eclipse.jetty.server.nio.NetworkTrafficSelectChannelConnector">
+            <constructor-arg ref="jettyServer" />
+            <property name="port" value="7777" />
+        </bean>
+    </util:list>
+
+
 
     <bean id="jettyServer" class="org.eclipse.jetty.server.Server" destroy-method="stop">
-        <!--property name="connectors">
-            <util:list>
-                <bean id>
-            </util:list>
-        </property-->
+        <property name="connectors" ref="webConnectors" />
 
         <property name="handler">
             <bean id="handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">

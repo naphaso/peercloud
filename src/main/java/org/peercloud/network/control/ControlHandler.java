@@ -39,6 +39,12 @@ public class ControlHandler implements Runnable {
                 return;
 
             // TODO: identification
+            event = xmlstream.nextTag();
+            if(!event.isStartElement() || !event.asStartElement().getName().getLocalPart().equals("id"))
+                return;
+            Identification identification = new Identification(xmlstream, Identification.IdentificationMode.SERVER);
+            identification.run();
+
 
             // TODO: authentification
 
