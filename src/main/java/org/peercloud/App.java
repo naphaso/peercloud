@@ -23,12 +23,21 @@ import java.util.List;
 import java.util.Timer;
 
 public class App {
+    private static AbstractApplicationContext context;
+    public AbstractApplicationContext getContext() {
+        return context;
+    }
     public static void main(String[] args) {
 
 
-        AbstractApplicationContext context = new ClassPathXmlApplicationContext("contexts/server.xml");
+        context = new ClassPathXmlApplicationContext("contexts/server.xml");
+
+
+
         //RoutingTable routingTable = (RoutingTable) context.getBean("routingTable");
         //routingTable.addRoute(new LinkID("30313233343536373839"), new RouteAction(new InetSocketAddress("127.0.0.1", 9092)));
+
+
 
         /*
         NoteService noteService = context.getBean(NoteService.class);

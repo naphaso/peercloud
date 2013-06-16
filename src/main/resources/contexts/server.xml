@@ -23,10 +23,10 @@
     <!--context:component-scan base-package="org.peercloud.service" /-->
 
     <!-- import data access beans -->
-    <!--import resource="classpath:/beans/data.xml" /-->
+    <import resource="classpath:/beans/data.xml" />
 
     <!-- web interface -->
     <!--import resource="classpath:/beans/web.xml" /-->
     <!--import resource="classpath:/beans/routing.xml" /-->
-    <import resource="classpath:/beans/control.xml" />
+    <!--import resource="classpath:/beans/control.xml" /-->
 </beans>

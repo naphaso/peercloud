@@ -3,8 +3,6 @@ package org.peercloud.persistence;
 import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.security.rsa.RSAPublicKeyImpl;
-import sun.util.logging.PlatformLogger;
 
 import javax.persistence.*;
 import java.math.BigInteger;
@@ -32,6 +30,9 @@ public class PublicKey {
     @Column
     private String key;
 
+    @OneToOne(optional = true)
+    private PrivateKey privateKey;
+
     private RSAPublicKey publicKey;
 
     public PublicKey(String key) {
@@ -39,10 +40,12 @@ public class PublicKey {
         generateFingerprint();
     }
 
+    public PublicKey() {
+    }
+
     private void generateFingerprint() {
-        MessageDigest digest = null;
         try {
-            digest = MessageDigest.getInstance("SHA-1");
+            MessageDigest digest = MessageDigest.getInstance("SHA-1");
 
             digest.reset();
             //digest.update(publicKey.getModulus().toString(16).getBytes());
@@ -52,23 +55,25 @@ public class PublicKey {
 
             fingerprint = Hex.encodeHexString(digest.digest());
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            logger.warn("generage fingerprint exception", e);
         }
     }
 
     private synchronized RSAPublicKey getPublicKey() {
         if(publicKey == null) {
             String[] publickeyParts = key.split(":");
-            BigInteger modulo = new BigInteger(publickeyParts[0], 16);
-            BigInteger publicExponent = new BigInteger(publickeyParts[1], 16);
-            RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulo, publicExponent);
-            try {
-                KeyFactory fact = KeyFactory.getInstance("RSA");
-                publicKey = (RSAPublicKey) fact.generatePublic(keySpec);
-            } catch (NoSuchAlgorithmException e) {
-                logger.warn("error loading public key", e);
-            } catch (InvalidKeySpecException e) {
-                logger.warn("error loading public key", e);
+            if(publickeyParts[0].equals("RSA")) {
+                BigInteger modulo = new BigInteger(publickeyParts[1], 16);
+                BigInteger publicExponent = new BigInteger(publickeyParts[2], 16);
+                RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulo, publicExponent);
+                try {
+                    KeyFactory fact = KeyFactory.getInstance("RSA");
+                    publicKey = (RSAPublicKey) fact.generatePublic(keySpec);
+                } catch (NoSuchAlgorithmException e) {
+                    logger.warn("error loading public key", e);
+                } catch (InvalidKeySpecException e) {
+                    logger.warn("error loading public key", e);
+                }
             }
         }
         return publicKey;
@@ -90,5 +95,9 @@ public class PublicKey {
             logger.warn("error on checking fingerprint");
             return false;
         }
+    }
+
+    public String getFingerprint() {
+        return fingerprint;
     }
 }
