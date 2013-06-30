@@ -164,7 +164,16 @@
             <artifactId>jetty-servlet</artifactId>
             <version>9.0.0.M5</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>9.0.0.M5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-jsp</artifactId>
+            <version>9.0.0.M5</version>
+        </dependency>
     </dependencies>
 
     <build>

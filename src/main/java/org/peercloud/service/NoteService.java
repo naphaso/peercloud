@@ -15,4 +15,5 @@ public interface NoteService {
     public void addNote(Note contact);
     public List<Note> listNote();
     public void removeNote(Integer id);
+    public Note getByData(byte[] data);
 }

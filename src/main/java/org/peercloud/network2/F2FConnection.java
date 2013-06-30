@@ -1,9 +1,8 @@
-package org.peercloud.network;
+package org.peercloud.network2;
 
 import com.fasterxml.aalto.AsyncInputFeeder;
 import com.fasterxml.aalto.AsyncXMLStreamReader;
 import com.fasterxml.aalto.stax.InputFactoryImpl;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import org.peercloud.Friend;
 import org.peercloud.xml.InitState;
@@ -12,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.XMLStreamException;
-import java.nio.charset.Charset;
 import java.util.Stack;
 
 /**

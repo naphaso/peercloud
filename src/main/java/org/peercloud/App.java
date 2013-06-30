@@ -1,26 +1,8 @@
 package org.peercloud;
 
-import com.thoughtworks.xstream.XStream;
-import io.netty.bootstrap.AbstractBootstrap;
-import io.netty.channel.Channel;
-import org.eclipse.jetty.server.nio.NetworkTrafficSelectChannelConnector;
-import org.hsqldb.rowio.RowOutputText;
-import org.peercloud.crypto.Certificate;
-import org.peercloud.crypto.CertificateFactory;
-import org.peercloud.crypto.CertificateStorage;
-import org.peercloud.dao.NoteDAO;
-import org.peercloud.network.Server;
-import org.peercloud.network.data.LinkID;
-import org.peercloud.network.data.RouteAction;
-import org.peercloud.network.data.RoutingTable;
-import org.peercloud.persistence.Note;
-import org.peercloud.service.NoteService;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.Timer;
+import sun.net.NetworkClient;
 
 public class App {
     private static AbstractApplicationContext context;
@@ -33,7 +15,23 @@ public class App {
         context = new ClassPathXmlApplicationContext("contexts/server.xml");
 
 
+        /*
+        NoteService noteService = context.getBean(NoteService.class);
 
+        List<Note> notes = noteService.listNote();
+        for(Note note : notes) {
+            noteService.removeNote(note.getId());
+        }
+
+        Note note = new Note();
+        note.setContent("hello");
+        note.setData("hello".getBytes());
+
+        noteService.addNote(note);
+
+        Note note2 = noteService.getByData("hello".getBytes());
+        System.out.println("note2 content: " + note2.getContent());
+*/
         //RoutingTable routingTable = (RoutingTable) context.getBean("routingTable");
         //routingTable.addRoute(new LinkID("30313233343536373839"), new RouteAction(new InetSocketAddress("127.0.0.1", 9092)));
 

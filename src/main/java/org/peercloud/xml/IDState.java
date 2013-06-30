@@ -5,8 +5,8 @@ import io.netty.channel.ChannelFuture;
 import org.peercloud.Friend;
 import org.peercloud.FriendManager;
 import org.peercloud.crypto.Certificate;
-import org.peercloud.network.F2FConnection;
-import org.peercloud.network.Server;
+import org.peercloud.network2.F2FConnection;
+import org.peercloud.network2.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

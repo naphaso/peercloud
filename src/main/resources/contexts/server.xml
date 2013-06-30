@@ -21,9 +21,10 @@
 
     <!--context:component-scan base-package="org.peercloud.network.data" /-->
     <!--context:component-scan base-package="org.peercloud.service" /-->
-
+    <!--context:component-scan base-package="org.peercloud.dao" /-->
+    <context:component-scan base-package="org.peercloud.network" />
     <!-- import data access beans -->
-    <import resource="classpath:/beans/data.xml" />
+    <!--import resource="classpath:/beans/data.xml" /-->
 
     <!-- web interface -->
     <!--import resource="classpath:/beans/web.xml" /-->

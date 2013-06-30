@@ -1,4 +1,4 @@
-package org.peercloud.network;
+package org.peercloud.network2;
 
 import io.netty.channel.Channel;
 import org.slf4j.Logger;

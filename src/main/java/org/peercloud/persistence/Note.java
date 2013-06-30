@@ -1,10 +1,7 @@
 package org.peercloud.persistence;
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 
 /**
@@ -17,7 +14,7 @@ import javax.persistence.Table;
 @Table
 public class Note {
 
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
     public Integer getId() {
@@ -36,8 +33,18 @@ public class Note {
         this.content = content;
     }
 
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
     @Column
     private String content;
 
+    @Column(length = 5000)
+    byte[] data;
 
 }

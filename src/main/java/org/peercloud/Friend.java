@@ -1,7 +1,7 @@
 package org.peercloud;
 
 import com.thoughtworks.xstream.annotations.*;
-import org.peercloud.network.F2FConnection;
+import org.peercloud.network2.F2FConnection;
 
 /**
  * Created with IntelliJ IDEA.

@@ -22,7 +22,7 @@
         <property name="threadNamePrefix" value="F2FThread-" />
     </bean>
 
-    <bean id="controlServer" class="org.peercloud.network.control.ControlServer">
+    <bean id="controlServer" class="org.peercloud.network2.control.ControlServer">
         <property name="port" value="9999" />
         <property name="threadPoolExecutor" ref="threadPool" />
     </bean>

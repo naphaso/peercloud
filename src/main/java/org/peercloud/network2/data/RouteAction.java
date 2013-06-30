@@ -1,4 +1,4 @@
-package org.peercloud.network.data;
+package org.peercloud.network2.data;
 
 import java.net.InetSocketAddress;
 import java.util.Date;

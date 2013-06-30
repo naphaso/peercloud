@@ -1,4 +1,4 @@
-package org.peercloud.network.data;
+package org.peercloud.network2.data;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;

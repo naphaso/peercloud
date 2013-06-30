@@ -35,4 +35,9 @@ public class NoteServiceImpl implements NoteService {
     public void removeNote(Integer id) {
         noteDAO.removeNote(id);
     }
+
+    @Override @Transactional
+    public Note getByData(byte[] data) {
+        return noteDAO.getByData(data);
+    }
 }

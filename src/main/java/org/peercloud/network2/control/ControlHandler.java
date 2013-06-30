@@ -1,4 +1,4 @@
-package org.peercloud.network.control;
+package org.peercloud.network2.control;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

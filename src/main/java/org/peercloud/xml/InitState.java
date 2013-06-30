@@ -1,7 +1,7 @@
 package org.peercloud.xml;
 
 import com.fasterxml.aalto.AsyncXMLStreamReader;
-import org.peercloud.network.F2FConnection;
+import org.peercloud.network2.F2FConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

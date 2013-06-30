@@ -1,4 +1,4 @@
-package org.peercloud.network.data;
+package org.peercloud.network2.data;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInboundMessageHandlerAdapter;

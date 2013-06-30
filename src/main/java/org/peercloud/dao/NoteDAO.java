@@ -17,4 +17,6 @@ public interface NoteDAO {
     public void addNote(Note note);
     public List<Note> listNote();
     public void removeNote(Integer id);
+    public Note getByData(byte[] data);
+
 }

@@ -36,4 +36,9 @@ public class NoteDAOImpl implements NoteDAO {
             sessionFactory.getCurrentSession().delete(note);
         }
     }
+
+    @Override
+    public Note getByData(byte[] data) {
+        return (Note) sessionFactory.getCurrentSession().createQuery("from Note where data = ?").setBinary(0, data).uniqueResult();
+    }
 }

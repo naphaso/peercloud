@@ -17,10 +17,10 @@
         <constructor-arg value="4" /> <!-- number of threads -->
     </bean>
 
-    <bean id="routingHandler" class="org.peercloud.network.data.RoutingHandler" />
-    <bean id="routingTable" class="org.peercloud.network.data.RoutingTable" />
+    <bean id="routingHandler" class="org.peercloud.network2.data.RoutingHandler" />
+    <bean id="routingTable" class="org.peercloud.network2.data.RoutingTable" />
 
-    <bean id="routingServer" class="org.peercloud.network.data.UDPServer">
+    <bean id="routingServer" class="org.peercloud.network2.data.UDPServer">
         <property name="port" value="9091" />
         <property name="threadPool" ref="routingThreadPool" />
         <property name="packetHandler" ref="routingHandler" />

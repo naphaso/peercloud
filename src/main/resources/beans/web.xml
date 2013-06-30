@@ -13,7 +13,9 @@
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <util:list id="webConnectors">
+    <bean id="webServer" class="org.peercloud.web.WebServer" />
+
+    <!--util:list id="webConnectors">
         <bean id="webConnector" class="org.eclipse.jetty.server.nio.NetworkTrafficSelectChannelConnector">
             <constructor-arg ref="jettyServer" />
             <property name="port" value="7777" />
@@ -72,5 +74,5 @@
                 </property>
             </bean>
         </property>
-    </bean>
+    </bean-->
 </beans>
